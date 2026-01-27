@@ -1,26 +1,22 @@
 :root {
-    --primary: #6C63FF;
-    /* Modern Purple */
-    --primary-dark: #5a52d5;
-    --secondary: #00D2D3;
-    /* Teal */
-    --accent: #FF6B6B;
-    /* Soft Red for alerts/action */
-    --bg-main: #F4F7FE;
-    /* Light Gray/Blueish */
-    --bg-main: #Eef2ff;
-    /* Clearly Lavender/Blueish */
-    /* Light Gray/Blueish */
+    --primary: #4e54c8;
+    /* Electric Indigo */
+    --primary-dark: #3c40c6;
+    --secondary: #00d2d3;
+    /* Bright Teal */
+    --accent: #ff6b6b;
+    /* Pastel Red */
+    --bg-main: #f0f2f5;
+    /* Clean Slate */
     --bg-card: #FFFFFF;
-    /* Keep cards white for contrast */
     --bg-card-alt: #F8Faff;
     --text-main: #2D3436;
     --text-muted: #636E72;
     --text-light: #DFE6E9;
     --radius-lg: 24px;
     --radius-md: 16px;
-    --shadow-soft: 0 10px 40px -10px rgba(108, 99, 255, 0.15);
-    --shadow-hover: 0 15px 45px -10px rgba(108, 99, 255, 0.25);
+    --shadow-soft: 0 10px 40px -10px rgba(78, 84, 200, 0.15);
+    --shadow-hover: 0 15px 45px -10px rgba(78, 84, 200, 0.25);
     --font-main: 'Poppins', sans-serif;
 }
 
@@ -33,11 +29,10 @@
 
 body {
     font-family: var(--font-main);
-    /* Stronger mesh gradient */
-    background: radial-gradient(circle at 10% 20%, rgba(108, 99, 255, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(0, 210, 211, 0.1) 0%, transparent 40%),
-        #E0E7FF;
-    /* Indigo 100 ish */
+    /* Premium Mesh Gradient */
+    background: radial-gradient(circle at 0% 0%, rgba(78, 84, 200, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(0, 210, 211, 0.15) 0%, transparent 50%),
+        #f4f7fe;
     color: var(--text-main);
     display: flex;
     justify-content: center;
@@ -101,9 +96,9 @@ h4 {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
     color: white;
-    box-shadow: 0 8px 20px -6px rgba(108, 99, 255, 0.4);
+    box-shadow: 0 8px 20px -6px rgba(78, 84, 200, 0.4);
 }
 
 .btn-primary:active {
@@ -146,10 +141,10 @@ h4 {
 .balance-card {
     margin: 24px 20px;
     padding: 24px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background: linear-gradient(135deg, #8f94fb 0%, #4e54c8 100%);
     border-radius: var(--radius-lg);
     color: white;
-    box-shadow: 0 20px 40px -10px rgba(108, 99, 255, 0.4);
+    box-shadow: 0 20px 40px -10px rgba(78, 84, 200, 0.4);
     position: relative;
     overflow: hidden;
 }
@@ -567,4 +562,16 @@ h4 {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Password Toggle */
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 45px;
+    /* Adjust based on label height + padding */
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    z-index: 10;
 }

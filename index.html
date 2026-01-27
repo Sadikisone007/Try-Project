@@ -14,7 +14,61 @@
 
 <body>
 
-    <div id="app">
+    <div id="authView" class="feature-view"
+        style="display: flex; flex-direction: column; justify-content: center; height: 100vh; background: var(--bg-main);">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div
+                style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; color: white; font-size: 2rem; box-shadow: var(--shadow-soft);">
+                <i class="ri-wallet-3-line"></i>
+            </div>
+            <h1 style="color: var(--primary);">Simp Cash</h1>
+            <p class="text-muted">Simple. Fast. Secure.</p>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="fade-in">
+            <h3 style="text-align: center; margin-bottom: 20px;">Welcome Back</h3>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="loginPhone" placeholder="017..." class="input-field">
+            </div>
+            <div class="form-group" style="position: relative;">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="******" class="input-field">
+                <i class="ri-eye-off-line password-toggle" onclick="togglePassword('loginPassword', this)"></i>
+            </div>
+            <button class="btn btn-primary full-width" onclick="handleLogin()">Sign In</button>
+            <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+                Don't have an account? <span style="color: var(--primary); cursor: pointer; font-weight: 600;"
+                    onclick="showSignUp()">Sign Up</span>
+            </p>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div id="signUpForm" class="fade-in hidden">
+            <h3 style="text-align: center; margin-bottom: 20px;">Create Account</h3>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="signupName" placeholder="Your Name" class="input-field">
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="signupPhone" placeholder="017..." class="input-field">
+            </div>
+            <div class="form-group" style="position: relative;">
+                <label>Password</label>
+                <input type="password" id="signupPassword" placeholder="******" class="input-field">
+                <i class="ri-eye-off-line password-toggle" onclick="togglePassword('signupPassword', this)"></i>
+            </div>
+            <button class="btn btn-primary full-width" onclick="handleSignUp()">Sign Up</button>
+            <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+                Already have an account? <span style="color: var(--primary); cursor: pointer; font-weight: 600;"
+                    onclick="showLogin()">Sign In</span>
+            </p>
+        </div>
+    </div>
+
+    <div id="app" class="hidden">
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="user-profile">
@@ -24,9 +78,11 @@
                     <div style="font-weight: 700;">Sadik</div>
                 </div>
             </div>
-            <div class="actions" onclick="showInbox()">
-                <i class="ri-notification-3-line"
+            <div class="actions" style="display: flex; gap: 15px; align-items: center;">
+                <i class="ri-notification-3-line" onclick="showInbox()"
                     style="font-size: 1.5rem; color: var(--text-main); cursor: pointer;"></i>
+                <i class="ri-logout-circle-r-line" onclick="logout()"
+                    style="font-size: 1.5rem; color: var(--accent); cursor: pointer;"></i>
             </div>
         </div>
 
@@ -114,11 +170,11 @@
             </div>
             <div class="form-group">
                 <label>Agent Number</label>
-                <input type="tel" placeholder="Enter Agent ID" class="input-field">
+                <input type="tel" placeholder="Enter Agent ID" class="input-field" id="cashOutAgent">
             </div>
             <div class="form-group">
                 <label>Amount</label>
-                <input type="number" placeholder="$0.00" class="input-field">
+                <input type="number" placeholder="$0.00" class="input-field" id="cashOutAmount">
             </div>
             <button class="btn btn-primary full-width" onclick="processTransaction('Cash Out')">Approve Cash
                 Out</button>
@@ -131,7 +187,8 @@
             </div>
             <div class="form-group">
                 <label>Mobile Operator</label>
-                <select class="input-field">
+                <select class="input-field" id="rechargeOperator">
+                    <option value="">Select Operator</option>
                     <option>Grameenphone</option>
                     <option>Robi</option>
                     <option>Banglalink</option>
@@ -140,11 +197,11 @@
             </div>
             <div class="form-group">
                 <label>Mobile Number</label>
-                <input type="tel" placeholder="017..." class="input-field">
+                <input type="tel" placeholder="017..." class="input-field" id="rechargeNumber">
             </div>
             <div class="form-group">
                 <label>Amount</label>
-                <input type="number" placeholder="Min $10" class="input-field">
+                <input type="number" placeholder="Min $10" class="input-field" id="rechargeAmount">
             </div>
             <button class="btn btn-primary full-width" onclick="processTransaction('Recharge')">Recharge</button>
         </div>
@@ -156,14 +213,14 @@
             </div>
             <div class="form-group">
                 <label>Source</label>
-                <select class="input-field">
+                <select class="input-field" id="addMoneySource">
                     <option>Bank Account</option>
                     <option>Visa/MasterCard</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Amount</label>
-                <input type="number" placeholder="$0.00" class="input-field">
+                <input type="number" placeholder="$0.00" class="input-field" id="addMoneyAmount">
             </div>
             <button class="btn btn-primary full-width" onclick="processTransaction('Add Money')">Add Funds</button>
         </div>
@@ -199,27 +256,39 @@
             <div class="view-header">
                 <h3>My Profile</h3>
             </div>
-            <div style="text-align: center; margin-bottom: 30px;">
-                <div class="avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 10px auto;">S
+            <div style="text-align: center; margin-bottom: 30px; position: relative;">
+                <input type="file" id="profileUpload" accept="image/*" style="display: none;"
+                    onchange="handleProfileImageChange(event)">
+                <div class="avatar"
+                    style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 10px auto; cursor: pointer; position: relative;"
+                    onclick="triggerProfileUpload()" id="profileAvatar">
+                    S
+                    <div
+                        style="position: absolute; bottom: 0; right: 0; background: var(--secondary); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white;">
+                        <i class="ri-camera-fill" style="font-size: 0.8rem; color: white;"></i>
+                    </div>
                 </div>
-                <h2 style="color: var(--primary);">Sadik</h2>
-                <span class="text-muted">01712345678</span>
+                <h2 style="color: var(--primary);" id="profileNameContainer"><span id="profileName">Sadik</span></h2>
+                <div class="text-muted" id="profilePhoneContainer"><span id="profilePhone">01712345678</span></div>
+
+                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.8rem; margin-top: 10px;"
+                    id="editProfileBtn" onclick="toggleEditProfile()">Edit Profile</button>
             </div>
 
             <div class="actions-grid" style="grid-template-columns: 1fr; gap: 10px; padding: 0;">
-                <div class="action-item"
+                <div class="action-item" onclick="handleProfileOption('Account Settings')"
                     style="flex-direction: row; background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); justify-content: flex-start;">
                     <i class="ri-user-settings-line"
                         style="font-size: 1.2rem; color: var(--primary); margin-right: 12px;"></i>
                     <span style="font-weight: 500;">Account Settings</span>
                 </div>
-                <div class="action-item"
+                <div class="action-item" onclick="handleProfileOption('Privacy & Security')"
                     style="flex-direction: row; background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); justify-content: flex-start;">
                     <i class="ri-shield-check-line"
                         style="font-size: 1.2rem; color: var(--primary); margin-right: 12px;"></i>
                     <span style="font-weight: 500;">Privacy & Security</span>
                 </div>
-                <div class="action-item"
+                <div class="action-item" onclick="handleProfileOption('Support')"
                     style="flex-direction: row; background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); justify-content: flex-start;">
                     <i class="ri-customer-service-2-line"
                         style="font-size: 1.2rem; color: var(--primary); margin-right: 12px;"></i>
@@ -241,18 +310,7 @@
             </div>
         </div>
 
-        <!-- Scan QR View -->
-        <div id="scanView" class="feature-view hidden" style="padding: 0; background: black;">
-            <div class="scanner-container">
-                <video id="qr-video" playsinline></video>
-                <div class="scanner-overlay">
-                    <div class="scan-area"></div>
-                    <div class="scan-text">Place QR Code within frame</div>
-                    <button class="btn btn-primary" onclick="stopScanner(); showDashboard()"
-                        style="margin-top: 20px;">Cancel</button>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
