@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simp Cash</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons (Remix Icon) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="user-profile">
+                <div class="avatar">S</div>
+                <div class="user-info">
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Good Morning</div>
+                    <div style="font-weight: 700;">Sadik</div>
+                </div>
+            </div>
+            <div class="actions" onclick="showInbox()">
+                <i class="ri-notification-3-line"
+                    style="font-size: 1.5rem; color: var(--text-main); cursor: pointer;"></i>
+            </div>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="balance-card">
+            <div style="font-size: 0.9rem; opacity: 0.9;">Total Balance</div>
+            <div class="balance-amount" id="balanceDisplay" onclick="toggleBalance()">
+                $2,450.50
+            </div>
+            <div class="tap-hint">Tap to reveal balance</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="actions-grid">
+            <div class="action-item" onclick="handleAction('Send Money')">
+                <div class="icon-box"><i class="ri-send-plane-fill"></i></div>
+                <span class="action-label">Send</span>
+            </div>
+            <div class="action-item" onclick="handleAction('Cash Out')">
+                <div class="icon-box"><i class="ri-download-2-fill"></i></div>
+                <span class="action-label">Cash Out</span>
+            </div>
+            <div class="action-item" onclick="handleAction('Recharge')">
+                <div class="icon-box"><i class="ri-smartphone-line"></i></div>
+                <span class="action-label">Recharge</span>
+            </div>
+            <div class="action-item" onclick="handleAction('Add Money')">
+                <div class="icon-box"><i class="ri-add-circle-line"></i></div>
+                <span class="action-label">Add Money</span>
+            </div>
+            <!-- Row 2 -->
+            <div class="action-item" onclick="handleAction('Pay Bill')">
+                <div class="icon-box"><i class="ri-bill-line"></i></div>
+                <span class="action-label">Pay Bill</span>
+            </div>
+            <div class="action-item" onclick="handleAction('Savings')">
+                <div class="icon-box"><i class="ri-safe-2-line"></i></div>
+                <span class="action-label">Savings</span>
+            </div>
+            <div class="action-item" onclick="handleAction('Loan')">
+                <div class="icon-box"><i class="ri-hand-coin-line"></i></div>
+                <span class="action-label">Loan</span>
+            </div>
+            <div class="action-item" onclick="handleAction('More')">
+                <div class="icon-box"><i class="ri-function-line"></i></div>
+                <span class="action-label">More</span>
+            </div>
+        </div>
+
+        <!-- Transactions -->
+        <div id="dashboardView">
+            <div class="transactions-section">
+                <div class="section-header">
+                    <h3>Recent Activity</h3>
+                    <span style="color: var(--primary); font-size: 0.9rem; font-weight: 500; cursor: pointer;"
+                        onclick="handleSeeAll()">See All</span>
+                </div>
+                <div id="transactionList">
+                    <!-- Javascript will populate this -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Views (Hidden by default) -->
+        <div id="sendMoneyView" class="feature-view hidden">
+            <div class="view-header">
+                <i class="ri-arrow-left-line back-btn" onclick="showDashboard()"></i>
+                <h3>Send Money</h3>
+            </div>
+            <div class="form-group">
+                <label>Receiver Number</label>
+                <input type="tel" placeholder="017..." class="input-field" id="sendMoneyNumber">
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" placeholder="$0.00" class="input-field" id="sendMoneyAmount">
+            </div>
+            <button class="btn btn-primary full-width" onclick="processTransaction('Send Money')">Send Now</button>
+        </div>
+
+        <div id="cashOutView" class="feature-view hidden">
+            <div class="view-header">
+                <i class="ri-arrow-left-line back-btn" onclick="showDashboard()"></i>
+                <h3>Cash Out</h3>
+            </div>
+            <div class="form-group">
+                <label>Agent Number</label>
+                <input type="tel" placeholder="Enter Agent ID" class="input-field">
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" placeholder="$0.00" class="input-field">
+            </div>
+            <button class="btn btn-primary full-width" onclick="processTransaction('Cash Out')">Approve Cash
+                Out</button>
+        </div>
+
+        <div id="rechargeView" class="feature-view hidden">
+            <div class="view-header">
+                <i class="ri-arrow-left-line back-btn" onclick="showDashboard()"></i>
+                <h3>Mobile Recharge</h3>
+            </div>
+            <div class="form-group">
+                <label>Mobile Operator</label>
+                <select class="input-field">
+                    <option>Grameenphone</option>
+                    <option>Robi</option>
+                    <option>Banglalink</option>
+                    <option>Airtel</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="tel" placeholder="017..." class="input-field">
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" placeholder="Min $10" class="input-field">
+            </div>
+            <button class="btn btn-primary full-width" onclick="processTransaction('Recharge')">Recharge</button>
+        </div>
+
+        <div id="addMoneyView" class="feature-view hidden">
+            <div class="view-header">
+                <i class="ri-arrow-left-line back-btn" onclick="showDashboard()"></i>
+                <h3>Add Money</h3>
+            </div>
+            <div class="form-group">
+                <label>Source</label>
+                <select class="input-field">
+                    <option>Bank Account</option>
+                    <option>Visa/MasterCard</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" placeholder="$0.00" class="input-field">
+            </div>
+            <button class="btn btn-primary full-width" onclick="processTransaction('Add Money')">Add Funds</button>
+        </div>
+
+        <!-- Inbox View -->
+        <div id="inboxView" class="feature-view hidden">
+            <div class="view-header">
+                <i class="ri-arrow-left-line back-btn" onclick="showDashboard()"></i>
+                <h3>Inbox</h3>
+            </div>
+            <div class="inbox-list">
+                <!-- Notifications will go here -->
+                <div class="transaction-item">
+                    <div class="t-icon" style="background: rgba(255, 107, 107, 0.1); color: var(--accent);"><i
+                            class="ri-gift-line"></i></div>
+                    <div class="t-info">
+                        <div class="t-title">Welcome Bonus!</div>
+                        <div class="t-date">You received $5 bonus</div>
+                    </div>
+                </div>
+                <div class="transaction-item">
+                    <div class="t-icon"><i class="ri-secure-payment-line"></i></div>
+                    <div class="t-info">
+                        <div class="t-title">Security Alert</div>
+                        <div class="t-date">New login from Chrome</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div id="profileView" class="feature-view hidden">
+            <div class="view-header">
+                <h3>My Profile</h3>
+            </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div class="avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 10px auto;">S
+                </div>
+                <h2 style="color: var(--primary);">Sadik</h2>
+                <span class="text-muted">01712345678</span>
+            </div>
+
+            <div class="actions-grid" style="grid-template-columns: 1fr; gap: 10px; padding: 0;">
+                <div class="action-item"
+                    style="flex-direction: row; background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); justify-content: flex-start;">
+                    <i class="ri-user-settings-line"
+                        style="font-size: 1.2rem; color: var(--primary); margin-right: 12px;"></i>
+                    <span style="font-weight: 500;">Account Settings</span>
+                </div>
+                <div class="action-item"
+                    style="flex-direction: row; background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); justify-content: flex-start;">
+                    <i class="ri-shield-check-line"
+                        style="font-size: 1.2rem; color: var(--primary); margin-right: 12px;"></i>
+                    <span style="font-weight: 500;">Privacy & Security</span>
+                </div>
+                <div class="action-item"
+                    style="flex-direction: row; background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); justify-content: flex-start;">
+                    <i class="ri-customer-service-2-line"
+                        style="font-size: 1.2rem; color: var(--primary); margin-right: 12px;"></i>
+                    <span style="font-weight: 500;">Support</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scan QR View -->
+        <div id="scanView" class="feature-view hidden" style="padding: 0; background: black;">
+            <div class="scanner-container">
+                <video id="qr-video" playsinline></video>
+                <div class="scanner-overlay">
+                    <div class="scan-area"></div>
+                    <div class="scan-text">Place QR Code within frame</div>
+                    <button class="btn btn-primary" onclick="stopScanner(); showDashboard()"
+                        style="margin-top: 20px;">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scan QR View -->
+        <div id="scanView" class="feature-view hidden" style="padding: 0; background: black;">
+            <div class="scanner-container">
+                <video id="qr-video" playsinline></video>
+                <div class="scanner-overlay">
+                    <div class="scan-area"></div>
+                    <div class="scan-text">Place QR Code within frame</div>
+                    <button class="btn btn-primary" onclick="stopScanner(); showDashboard()"
+                        style="margin-top: 20px;">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <i class="ri-home-5-fill"></i>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item">
+                <i class="ri-qr-code-line"></i>
+                <span class="nav-label">Scan</span>
+            </div>
+            <div class="nav-item">
+                <i class="ri-mail-line"></i>
+                <span class="nav-label">Inbox</span>
+            </div>
+            <div class="nav-item">
+                <i class="ri-user-3-line"></i>
+                <span class="nav-label">Profile</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
