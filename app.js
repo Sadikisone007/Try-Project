@@ -3,7 +3,14 @@
 // Auth Logic
 const currentUser = localStorage.getItem('currentUser');
 if (currentUser) {
-    showApp(JSON.parse(currentUser));
+    try {
+        const user = JSON.parse(currentUser);
+        showApp(user);
+    } catch (e) {
+        console.error("Auth Data Corrupted", e);
+        localStorage.removeItem('currentUser');
+        window.location.reload();
+    }
 } else {
     document.getElementById('authView').classList.remove('hidden');
     document.getElementById('app').classList.add('hidden');
@@ -22,10 +29,55 @@ function showApp(user) {
     document.getElementById('topBarGreeting').innerText = greeting;
     document.getElementById('topBarName').innerText = user.name || 'User';
 
-    // Update Avatar (First letter of name)
+    // Update Icons/Avatars
     const initial = (user.name || 'U').charAt(0).toUpperCase();
-    document.getElementById('topBarAvatar').innerText = initial;
-    document.getElementById('profileInitial').innerText = initial;
+
+    // Top Bar Avatar
+    const topAvatar = document.getElementById('topBarAvatar');
+    if (user.profilePic) {
+        topAvatar.innerText = '';
+        topAvatar.style.backgroundImage = `url('${user.profilePic}')`;
+        topAvatar.style.backgroundSize = 'cover';
+        topAvatar.style.backgroundPosition = 'center';
+    } else {
+        topAvatar.style.backgroundImage = 'none';
+        topAvatar.innerText = initial;
+    }
+
+    // Profile View Avatar
+    const profileAvatar = document.getElementById('profileAvatar');
+    const profileInitial = document.getElementById('profileInitial');
+
+    if (user.profilePic) {
+        profileInitial.style.display = 'none';
+        profileAvatar.style.backgroundImage = `url('${user.profilePic}')`;
+        profileAvatar.style.backgroundSize = 'cover';
+        profileAvatar.style.backgroundPosition = 'center';
+    } else {
+        profileInitial.style.display = 'block';
+        profileAvatar.style.backgroundImage = 'none';
+        profileInitial.innerText = initial;
+    }
+
+    // Initialize Balance/Transactions if new
+    if (user.balance === undefined) user.balance = 500.00; // Default new user bonus
+    if (!user.transactions) user.transactions = [];
+
+    // Save defaults back if they were missing
+    updateUserStorage(user);
+
+    updateBalanceUI();
+    renderTransactions();
+}
+
+function updateUserStorage(user) {
+    try {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        localStorage.setItem('user_' + user.phone, JSON.stringify(user));
+    } catch (e) {
+        alert("Storage Full! Profile image might be too large.");
+        console.error("Storage Error", e);
+    }
 }
 
 function getGreeting() {
@@ -46,7 +98,67 @@ function showSignUp() {
 
 function showLogin() {
     document.getElementById('signUpForm').classList.add('hidden');
+    document.getElementById('forgotPasswordView').classList.add('hidden');
     document.getElementById('loginForm').classList.remove('hidden');
+}
+
+function showForgotPassword() {
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('forgotPasswordView').classList.remove('hidden');
+    // Reset view state
+    document.getElementById('resetStep1').classList.remove('hidden');
+    document.getElementById('resetStep2').classList.add('hidden');
+    document.getElementById('resetPhone').value = '';
+    document.getElementById('resetOTP').value = '';
+    document.getElementById('newPassword').value = '';
+}
+
+let pendingResetPhone = null;
+
+function initiatePasswordReset() {
+    const phone = document.getElementById('resetPhone').value;
+    if (!phone) {
+        alert("Please enter your phone number");
+        return;
+    }
+
+    // Check if user exists
+    const userData = localStorage.getItem('user_' + phone);
+    if (!userData) {
+        alert("No account found with this number.");
+        return;
+    }
+
+    pendingResetPhone = phone;
+    // Simulate OTP
+    alert("OTP sent to " + phone + ": 1234");
+
+    document.getElementById('resetStep1').classList.add('hidden');
+    document.getElementById('resetStep2').classList.remove('hidden');
+}
+
+function completePasswordReset() {
+    const otp = document.getElementById('resetOTP').value;
+    const newPass = document.getElementById('newPassword').value;
+
+    if (otp !== '1234') {
+        alert("Invalid OTP");
+        return;
+    }
+    if (!newPass) {
+        alert("Enter a new password");
+        return;
+    }
+
+    // Update Password
+    const userData = localStorage.getItem('user_' + pendingResetPhone);
+    const user = JSON.parse(userData);
+    user.pass = newPass;
+
+    updateUserStorage(user);
+
+    alert("Password Reset Successful! Please Login.");
+    showLogin();
 }
 
 function handleSignUp() {
@@ -120,30 +232,29 @@ function togglePassword(inputId, icon) {
     }
 }
 
-// Mock Data
-let isBalanceVisible = false;
-const transactions = [
-    { id: 1, type: 'Send Money', to: 'Alice M.', date: 'Today, 10:23 AM', amount: '-$50.00', isPlus: false },
-    { id: 2, type: 'Add Money', to: 'Bank Transfer', date: 'Yesterday', amount: '+$500.00', isPlus: true },
-    { id: 3, type: 'Recharge', to: '01712...', date: 'Jan 26', amount: '-$10.00', isPlus: false },
-    { id: 4, type: 'Cash Out', to: 'Agent Store', date: 'Jan 25', amount: '-$100.00', isPlus: false },
-];
+// Data Logic
+function getCurrentUser() {
+    return JSON.parse(localStorage.getItem('currentUser'));
+}
 
-function toggleBalance() {
-    const el = document.getElementById('balanceDisplay');
-    isBalanceVisible = !isBalanceVisible;
-    if (isBalanceVisible) {
-        el.classList.add('visible');
-    } else {
-        el.classList.remove('visible');
-    }
+function updateBalanceUI() {
+    const user = getCurrentUser();
+    document.getElementById('balanceDisplay').innerText = '$' + user.balance.toFixed(2);
 }
 
 function renderTransactions() {
     const list = document.getElementById('transactionList');
     list.innerHTML = ''; // Clear
 
-    transactions.forEach(t => {
+    const user = getCurrentUser();
+    const history = user.transactions || [];
+
+    if (history.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-muted);">No recent activity</div>';
+        return;
+    }
+
+    history.forEach(t => {
         const item = document.createElement('div');
         item.className = 'transaction-item fade-in';
 
@@ -165,6 +276,18 @@ function renderTransactions() {
     });
 }
 
+let isBalanceVisible = false;
+function toggleBalance() {
+    const el = document.getElementById('balanceDisplay');
+    isBalanceVisible = !isBalanceVisible;
+    if (isBalanceVisible) {
+        el.classList.add('visible');
+    } else {
+        el.classList.remove('visible');
+    }
+}
+
+
 function handleAction(actionName) {
     if (actionName === 'Send Money') {
         showView('sendMoneyView');
@@ -180,7 +303,31 @@ function handleAction(actionName) {
 }
 
 function handleProfileOption(option) {
-    alert(`${option} coming soon!`);
+    if (option === 'Account Settings') {
+        const user = getCurrentUser();
+        // Pre-fill name if element exists
+        const nameInput = document.getElementById('settingNameInput');
+        if (nameInput) nameInput.value = user.name || '';
+        showView('accountSettingsView');
+    } else if (option === 'Privacy & Security') {
+        showView('privacyView');
+    } else if (option === 'Support') {
+        showView('supportView');
+    } else {
+        alert(`${option} coming soon!`);
+    }
+}
+
+function saveAccountSettings() {
+    const newName = document.getElementById('settingNameInput').value;
+    if (newName) {
+        const user = getCurrentUser();
+        user.name = newName;
+        updateUserStorage(user);
+        showApp(user); // refresh UI for top bar etc
+        alert("Settings Saved!");
+        showView('profileView');
+    }
 }
 
 function showView(viewId) {
@@ -258,27 +405,86 @@ function processTransaction(type) {
     btn.disabled = true;
 
     setTimeout(() => {
-        btn.innerText = 'Success!';
+        // Perform Transaction
+        const user = getCurrentUser();
+        let amountVal = 0;
+        let isPlus = false;
+        let title = type;
 
-        // Add to transaction list
-        const amount = type === 'Recharge' ? '$10.00' : '$50.00'; // Mock amounts
-        transactions.unshift({
+        if (type === 'Send Money') {
+            amountVal = parseFloat(document.getElementById('sendMoneyAmount').value);
+            if (user.balance < amountVal) {
+                alert("Insufficient Balance");
+                btn.innerText = originalText;
+                btn.disabled = false;
+                return;
+            }
+            user.balance -= amountVal;
+        }
+        else if (type === 'Cash Out') {
+            amountVal = parseFloat(document.getElementById('cashOutAmount').value);
+            if (user.balance < amountVal) {
+                alert("Insufficient Balance");
+                btn.innerText = originalText;
+                btn.disabled = false;
+                return;
+            }
+            user.balance -= amountVal;
+        }
+        else if (type === 'Recharge') {
+            amountVal = parseFloat(document.getElementById('rechargeAmount').value);
+            if (user.balance < amountVal) {
+                alert("Insufficient Balance");
+                btn.innerText = originalText;
+                btn.disabled = false;
+                return;
+            }
+            user.balance -= amountVal;
+        }
+        else if (type === 'Add Money') {
+            amountVal = parseFloat(document.getElementById('addMoneyAmount').value);
+            user.balance += amountVal;
+            isPlus = true;
+        }
+
+        // Add to History
+        const newTx = {
             id: Date.now(),
-            type: type,
-            to: 'New Transaction',
-            date: 'Just Now',
-            amount: `-${amount}`,
-            isPlus: false
-        });
+            type: title,
+            date: 'Just Now', // In real app, use formatting
+            amount: (isPlus ? '+' : '-') + '$' + amountVal.toFixed(2),
+            isPlus: isPlus
+        };
+
+        user.transactions.unshift(newTx);
+        updateUserStorage(user);
+
+        // UI Updates
+        updateBalanceUI();
         renderTransactions();
+
+        btn.innerText = 'Success!';
 
         setTimeout(() => {
             btn.innerText = originalText;
             btn.disabled = false;
             showDashboard();
             alert(`${type} Successful!`);
+
+            // Clear inputs
+            document.querySelectorAll('input').forEach(i => i.value = '');
         }, 1000);
     }, 1500);
+}
+
+function showInbox() {
+    stopScanner();
+    showView('inboxView');
+
+    // Update bottom nav to active state
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(n => n.classList.remove('active'));
+    navItems[2].classList.add('active'); // Index 2 is Inbox
 }
 
 // Navigation Logic
@@ -349,18 +555,53 @@ function triggerProfileUpload() {
 function handleProfileImageChange(event) {
     const file = event.target.files[0];
     if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const avatar = document.getElementById('profileAvatar');
-            avatar.style.backgroundImage = `url('${e.target.result}')`;
-            avatar.style.backgroundSize = 'cover';
-            avatar.style.backgroundPosition = 'center';
+        resizeImage(file, 200, 200, function (resizedBase64) {
+            // Save to User Data
+            const user = getCurrentUser();
+            user.profilePic = resizedBase64;
+            updateUserStorage(user);
 
-            // Hide the initial text since we have an image
-            document.getElementById('profileInitial').style.display = 'none';
-        }
-        reader.readAsDataURL(file);
+            // Update UI
+            showApp(user);
+        });
     }
+}
+
+function resizeImage(file, maxWidth, maxHeight, callback) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+            let width = img.width;
+            let height = img.height;
+
+            // Calculate new dimensions (Cover style crop or fit? Let's do fit/limit)
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Output as JPEG with 0.8 quality
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            callback(dataUrl);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
 let isEditingProfile = false;

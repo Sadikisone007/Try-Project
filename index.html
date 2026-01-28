@@ -37,10 +37,44 @@
                 <input type="password" id="loginPassword" placeholder="******" class="input-field">
                 <i class="ri-eye-off-line password-toggle" onclick="togglePassword('loginPassword', this)"></i>
             </div>
+            <div style="text-align: right; margin-bottom: 20px;">
+                <span style="color: var(--primary); font-size: 0.85rem; cursor: pointer; font-weight: 500;"
+                    onclick="showForgotPassword()">Forgot Password?</span>
+            </div>
             <button class="btn btn-primary full-width" onclick="handleLogin()">Sign In</button>
             <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
                 Don't have an account? <span style="color: var(--primary); cursor: pointer; font-weight: 600;"
                     onclick="showSignUp()">Sign Up</span>
+            </p>
+        </div>
+
+        <!-- Forgot Password View -->
+        <div id="forgotPasswordView" class="fade-in hidden">
+            <h3 style="text-align: center; margin-bottom: 20px;">Reset Password</h3>
+
+            <div id="resetStep1">
+                <div class="form-group">
+                    <label>Enter Registered Phone</label>
+                    <input type="tel" id="resetPhone" placeholder="017..." class="input-field">
+                </div>
+                <button class="btn btn-primary full-width" onclick="initiatePasswordReset()">Send Reset Code</button>
+            </div>
+
+            <div id="resetStep2" class="hidden">
+                <div class="form-group">
+                    <label>Enter OTP Code</label>
+                    <input type="number" id="resetOTP" placeholder="1234" class="input-field">
+                </div>
+                <div class="form-group" style="position: relative;">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="******" class="input-field">
+                    <i class="ri-eye-off-line password-toggle" onclick="togglePassword('newPassword', this)"></i>
+                </div>
+                <button class="btn btn-primary full-width" onclick="completePasswordReset()">Reset Password</button>
+            </div>
+
+            <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+                <span style="color: var(--text-muted); cursor: pointer;" onclick="showLogin()">Back to Login</span>
             </p>
         </div>
 
@@ -294,6 +328,48 @@
                         style="font-size: 1.2rem; color: var(--primary); margin-right: 12px;"></i>
                     <span style="font-weight: 500;">Support</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Settings Views -->
+        <div id="accountSettingsView" class="feature-view hidden">
+            <div class="view-header">
+                <i class="ri-arrow-left-line back-btn" onclick="showView('profileView')"></i>
+                <h3>Account Settings</h3>
+            </div>
+            <div class="form-group">
+                <label>Change Full Name</label>
+                <input type="text" id="settingNameInput" placeholder="Name" class="input-field">
+            </div>
+            <div class="form-group">
+                <label>Change Password</label>
+                <input type="password" placeholder="New Password" class="input-field">
+            </div>
+            <button class="btn btn-primary full-width" onclick="saveAccountSettings()">Save Changes</button>
+        </div>
+
+        <div id="privacyView" class="feature-view hidden">
+            <div class="view-header">
+                <i class="ri-arrow-left-line back-btn" onclick="showView('profileView')"></i>
+                <h3>Privacy & Security</h3>
+            </div>
+            <div class="form-group"
+                style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 15px; border-radius: 10px;">
+                <span>Hide Balance by Default</span>
+                <input type="checkbox" onchange="alert('Setting saved!')">
+            </div>
+        </div>
+
+        <div id="supportView" class="feature-view hidden">
+            <div class="view-header">
+                <i class="ri-arrow-left-line back-btn" onclick="showView('profileView')"></i>
+                <h3>Support</h3>
+            </div>
+            <div style="text-align: center; padding: 20px;">
+                <i class="ri-customer-service-2-line" style="font-size: 3rem; color: var(--primary);"></i>
+                <p style="margin-top: 10px;">Contact us at:</p>
+                <div style="font-weight: 700; font-size: 1.2rem;">support@simpcash.com</div>
+                <p class="text-muted">Call: 16216</p>
             </div>
         </div>
 
