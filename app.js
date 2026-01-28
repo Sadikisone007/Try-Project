@@ -354,14 +354,9 @@ function handleProfileImageChange(event) {
             avatar.style.backgroundImage = `url('${e.target.result}')`;
             avatar.style.backgroundSize = 'cover';
             avatar.style.backgroundPosition = 'center';
-            avatar.innerText = ''; // Remove initial 'S'
 
-            // Re-add camera icon overlay since innerText clear removed it (or handle strictly via CSS/structure)
-            // Simpler: Just set background and keep the icon in a separate sibling or ensure HTML structure persists.
-            // Let's re-inject the icon to be safe, or just leave it blank if bg covers.
-            // Better approach: The icon is inside .avatar in HTML. innerText='' wipes it.
-            // Let's preserve the icon.
-            avatar.innerHTML = `<div style="position: absolute; bottom: 0; right: 0; background: var(--secondary); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white;"><i class="ri-camera-fill" style="font-size: 0.8rem; color: white;"></i></div>`;
+            // Hide the initial text since we have an image
+            document.getElementById('profileInitial').style.display = 'none';
         }
         reader.readAsDataURL(file);
     }
