@@ -16,7 +16,26 @@ function showApp(user) {
     // Update UI with user data
     document.getElementById('profileName').innerText = user.name || 'User';
     document.getElementById('profilePhone').innerText = user.phone;
-    // Also update top bar if we can select it, or just rely on profile view sync
+
+    // Update Top Bar
+    const greeting = getGreeting();
+    document.getElementById('topBarGreeting').innerText = greeting;
+    document.getElementById('topBarName').innerText = user.name || 'User';
+
+    // Update Avatar (First letter of name)
+    const initial = (user.name || 'U').charAt(0).toUpperCase();
+    document.getElementById('topBarAvatar').innerText = initial;
+}
+
+function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+        return "Good Morning";
+    } else if (hour >= 12 && hour < 17) {
+        return "Good Afternoon";
+    } else {
+        return "Good Evening";
+    }
 }
 
 function showSignUp() {
