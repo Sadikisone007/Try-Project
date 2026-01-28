@@ -25,6 +25,7 @@ function showApp(user) {
     // Update Avatar (First letter of name)
     const initial = (user.name || 'U').charAt(0).toUpperCase();
     document.getElementById('topBarAvatar').innerText = initial;
+    document.getElementById('profileInitial').innerText = initial;
 }
 
 function getGreeting() {
